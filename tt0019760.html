@@ -2,23 +2,30 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Iframe بملء الشاشة</title>
+  <title>Iframe بملء الشاشة نهائي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* نزيل الهوامش ونتأكد أن الـhtml و body يملآن الارتفاع */
+    /* 1. نجعل html و body يملآن كامل الشاشة */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden; /* لمنع ظهور شريط تمرير */
+      width: 100%;
+      overflow: hidden; /* يمنع ظهور أشرطة التمرير */
     }
-    /* نجعل iframe مطلق الموضع ويملأ العرض والارتفاع */
+    /* 2. نجعل iframe في وضع ثابت بالنسبة للنافذة ويغطيها بالكامل */
     iframe {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;   /* 100% من عرض النافذة */
-      height: 100vh;  /* 100% من ارتفاع النافذة */
-      border: none;   /* إزالة الإطار الخارجي */
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      border: none;          /* إزالة الإطار الافتراضي */
+      margin: 0;             /* تأكد من عدم وجود هوامش داخلية */
+      padding: 0;            /* تأكد من عدم وجود حشوات داخلية */
+      display: block;        /* يمنع الفراغ الأبيض تحت iframe */
     }
   </style>
 </head>
@@ -31,9 +38,3 @@
   </iframe>
 </body>
 </html>
-
-
-
-
-
-
