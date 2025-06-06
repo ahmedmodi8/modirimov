@@ -2,29 +2,39 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>تزييف User-Agent لمشغل الفيديو</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embed Video مع UA مزوَّر بدون Proxy خاص</title>
 
   <script>
-    // فور تحميل الصفحة، نُعيد تعريف navigator.userAgent ليبدو كـDesktop Chrome
-    (function() {
-      const desktopUA = 
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-        "AppleWebKit/537.36 (KHTML, like Gecko) " +
-        "Chrome/114.0.0.0 Safari/537.36";
+  // 1) تزوير navigator.userAgent و userAgentData
+  (function() {
+    const fakeUA =
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+      "AppleWebKit/537.36 (KHTML, like Gecko) " +
+      "Chrome/114.0.0.0 Safari/537.36";
 
-      try {
-        // بعض المتصفحات تسمح بإعادة تعريف userAgent بهذه الطريقة
-        Object.defineProperty(navigator, 'userAgent', {
-          get: function() { return desktopUA; },
+    try {
+      Object.defineProperty(navigator, 'userAgent', {
+        get: () => fakeUA,
+        configurable: true
+      });
+      if (navigator.userAgentData) {
+        Object.defineProperty(navigator, 'userAgentData', {
+          get: () => ({
+            brands: [
+              {brand: "Chromium", version: "114"},
+              {brand: "Google Chrome", version: "114"}
+            ],
+            mobile: false,
+            platform: "Windows"
+          }),
           configurable: true
         });
-      } catch (e) {
-        // إذا فشل التزييف (بسبب سياسات الأمان)، نستخدم حيلة البديل:
-        // إنشاء iframe داخل `about:blank` ثم نفحص`contentWindow.navigator.userAgent`
-        console.warn("تعذّر إعادة تعريف userAgent مباشرةً:", e);
       }
-    })();
+    } catch (e) {
+      console.warn("تعذّر تزوير الUA مباشرةً:", e);
+    }
+  })();
   </script>
 
   <style>
@@ -32,8 +42,9 @@
       margin: 0; padding: 0;
       width: 100%; height: 100%;
       overflow: hidden;
+      background: black;
     }
-    iframe {
+    #videoFrame {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       width: 100%; height: 100%;
@@ -42,11 +53,55 @@
   </style>
 </head>
 <body>
-  <iframe
-    src="https://www.2embed.cc/embed/tt16729498"
-    allowfullscreen
-    webkitallowfullscreen
-    mozallowfullscreen>
+
+  <iframe id="videoFrame"
+          allowfullscreen
+          webkitallowfullscreen
+          mozallowfullscreen>
   </iframe>
+
+  <script>
+  (async function(){
+    // 2) استخدم AllOrigins كـ CORS-proxy عام
+    const target = "https://www.2embed.cc/embed/tt16729498";
+    const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(target);
+
+    try {
+      const resp = await fetch(proxy);
+      if (!resp.ok) throw new Error("Bad response from proxy");
+
+      const htmlText = await resp.text();
+
+      // 3) حقن الصفحة في iframe عبر srcdoc مع <base> لضبط المسارات
+      document.getElementById('videoFrame').srcdoc = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <base href="https://www.2embed.cc/">
+          <meta charset="utf-8">
+          <style>
+            html,body {
+              margin:0; padding:0;
+              width:100%; height:100%;
+              overflow:hidden;
+              background:black;
+            }
+            iframe, video {
+              position:absolute;
+              top:0; left:0;
+              width:100%; height:100%;
+              border:none;
+            }
+          </style>
+        </head>
+        <body>${htmlText}</body>
+        </html>
+      `;
+    } catch (err) {
+      console.error("فشل جلب أو حقن صفحة الفيديو:", err);
+    }
+  })();
+  </script>
+
 </body>
 </html>
