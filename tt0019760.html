@@ -1,19 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Iframe بملء الشاشة</title>
+  <style>
+    /* نزيل الهوامش ونتأكد أن الـhtml و body يملآن الارتفاع */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden; /* لمنع ظهور شريط تمرير */
+    }
+    /* نجعل iframe مطلق الموضع ويملأ العرض والارتفاع */
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;   /* 100% من عرض النافذة */
+      height: 100vh;  /* 100% من ارتفاع النافذة */
+      border: none;   /* إزالة الإطار الخارجي */
+    }
+  </style>
+</head>
 <body>
-
-	<div style="
-	position: absolute;
-	display: inline-block;
-	width: 100%;
-	height: 100%;
-	top: 0%;
-	right: 0px;
-	"class="embed-responsive embed-responsive-16by9">
-<iframe class="embed-responsive-item"
-		src="https://www.2embed.cc/embed/tt16729498" frameborder="0"></iframe>
-	</div>
-	
-	
+  <iframe
+    src="https://www.2embed.cc/embed/tt16729498"
+    allowfullscreen
+    webkitallowfullscreen
+    mozallowfullscreen>
+  </iframe>
 </body>
+</html>
 
 
 
