@@ -1,107 +1,126 @@
-<!DOCTYPE html>
-<html lang="ar">
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Embed Video مع UA مزوَّر بدون Proxy خاص</title>
 
-  <script>
-  // 1) تزوير navigator.userAgent و userAgentData
-  (function() {
-    const fakeUA =
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-      "AppleWebKit/537.36 (KHTML, like Gecko) " +
-      "Chrome/114.0.0.0 Safari/537.36";
+<title> TV+ </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1">
 
-    try {
-      Object.defineProperty(navigator, 'userAgent', {
-        get: () => fakeUA,
-        configurable: true
-      });
-      if (navigator.userAgentData) {
-        Object.defineProperty(navigator, 'userAgentData', {
-          get: () => ({
-            brands: [
-              {brand: "Chromium", version: "114"},
-              {brand: "Google Chrome", version: "114"}
-            ],
-            mobile: false,
-            platform: "Windows"
-          }),
-          configurable: true
-        });
-      }
-    } catch (e) {
-      console.warn("تعذّر تزوير الUA مباشرةً:", e);
-    }
-  })();
-  </script>
+<link href="../css/estilos.css" rel="stylesheet" type="text/css">
+<link rel="icon" href='../imagenes/Icon.png' type="image/png"/>
 
-  <style>
-    html, body {
-      margin: 0; padding: 0;
-      width: 100%; height: 100%;
-      overflow: hidden;
-      background: black;
-    }
-    #videoFrame {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100%; height: 100%;
-      border: none;
-    }
-  </style>
+<style> html,body{width:100%;height:100%} </style>
+
+<!--GOOGLE FONTS-->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@600;700&display=swap" rel="stylesheet">
+<!--GOOGLE ICONS-->
+<link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
+
+<link href="../css/video-js.css" rel="stylesheet">
+<script src="../js/video.js"></script>
+<script src="../js/videojs-contrib-hls.js"></script>
+<script src='../js/estilosvideojw.js'></script>
+<script>jwplayer.key='fpjDq6xZtjNRpxYoVu4nj0jRIZqgVeQSpqiuNYojy3JFZW2B';</script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RT53GZ16EW"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'G-RT53GZ16EW');
+</script>
+<!--bootstrap-->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+</script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+</script>
+
+<script type="text/javascript">
+
+// server.js
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+const path = require('path');
+const app = express(), PORT = 3000;
+
+app.use('/css', express.static(path.join(__dirname, 'css')));
+app.use('/js', express.static(path.join(__dirname, 'js')));
+app.use('/imagenes', express.static(path.join(__dirname, 'imagenes')));
+
+app.use('/proxy', createProxyMiddleware({
+  target: 'https://www.2embed.cc',
+  changeOrigin: true,
+  pathRewrite: { '^/proxy': '' },
+  onProxyReq: (req) => {
+    req.setHeader('User-Agent',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+      '(KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+    );
+    req.setHeader('Referer', 'https://www.2embed.cc/');
+  },
+}));
+
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html><html lang="ar"><head>
+      <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>TV+</title><link href="/css/estilos.css" rel="stylesheet">
+    </head><body style="margin:0">
+      <div style="position:absolute;top:0;left:0;width:100%;height:100%">
+        <iframe src="http://localhost:${PORT}/proxy/embed/tt16729498"
+                frameborder="0" allowfullscreen
+                style="width:100%;height:100%"></iframe>
+      </div>
+      <a href="javascript:location.reload()"
+         style="position:absolute;bottom:20px;right:20px;
+                background:#333;color:#fff;padding:10px;border-radius:4px;
+                text-decoration:none;font-family:sans-serif;">
+        🔄 إعادة تحميل
+      </a>
+    </body></html>
+  `);
+});
+
+app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
+
+
+</script>
+
 </head>
+
 <body>
 
-  <iframe id="videoFrame"
-          allowfullscreen
-          webkitallowfullscreen
-          mozallowfullscreen>
-  </iframe>
+	<div style="
+	position: absolute;
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	top: 0%;
+	right: 0px;
+	"class="embed-responsive embed-responsive-16by9">
+	<iframe class="embed-responsive-item"
+		src="https://www.2embed.cc/embed/tt16729498" frameborder="0"></iframe>
+	</div>
+	
+	<a style="text-decoration: none;" href="javascript:location.reload()" class="BotonCuadradoRecargarSeñalTexto waves-effect waves-white" role="button" >
+		<span class="material-icons">loop</span>
+	</a>
 
-  <script>
-  (async function(){
-    // 2) استخدم AllOrigins كـ CORS-proxy عام
-    const target = "https://www.2embed.cc/embed/tt16729498";
-    const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(target);
-
-    try {
-      const resp = await fetch(proxy);
-      if (!resp.ok) throw new Error("Bad response from proxy");
-
-      const htmlText = await resp.text();
-
-      // 3) حقن الصفحة في iframe عبر srcdoc مع <base> لضبط المسارات
-      document.getElementById('videoFrame').srcdoc = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <base href="https://www.2embed.cc/">
-          <meta charset="utf-8">
-          <style>
-            html,body {
-              margin:0; padding:0;
-              width:100%; height:100%;
-              overflow:hidden;
-              background:black;
-            }
-            iframe, video {
-              position:absolute;
-              top:0; left:0;
-              width:100%; height:100%;
-              border:none;
-            }
-          </style>
-        </head>
-        <body>${htmlText}</body>
-        </html>
-      `;
-    } catch (err) {
-      console.error("فشل جلب أو حقن صفحة الفيديو:", err);
-    }
-  })();
-  </script>
 
 </body>
 </html>
